@@ -19,6 +19,8 @@ install_github("MaeWoods/alignr");
 
 library("alignr")
 
+vignette("vignette",package="alignr")
+
 See the **vignette** for further help loading and running the software.
 
 **Vignettes**
