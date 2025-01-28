@@ -37,9 +37,9 @@ The TCR alpha and beta chains corresponding to the cells that have been selected
 
 ```{r}
 mybarcode="AAACCTGCACTCTGTC-1"
-my.contig.annotations=read.csv("Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.csv")
-my.json.path="Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.json"
-my.save.dir="Example/"
+my.contig.annotations=read.csv("../Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.csv")
+my.json.path="../Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.json"
+my.save.dir="../Example/"
 GetTCRs(barcodes = mybarcode,
         contig.annotations=my.contig.annotations,
         json.path=my.json.path,
@@ -50,8 +50,8 @@ GetTCRs(barcodes = mybarcode,
 The function GetTCRs in this case will have output three chains associated with the selected cell. Prior to the next step, which will output the receptor alpha and beta chains, check the txt files and use command search to see how many conditions must be satisfied to be true. Enter this into the function MakeReceptor, along with the number of cells being selected for receptor cloning and the input and output directories.  
 
 ```{r}
-MakeReceptor(1,4,path="Example/",
-             save.dir="Example/")
+MakeReceptor(1,4,path="../Example/",
+             save.dir="../Example/")
 ```
 
 ## References
