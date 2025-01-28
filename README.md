@@ -1,12 +1,6 @@
 # alignr 0.1.0: An R package that produces a full length human T cell receptor by calling fragments and genes from a 10X genomics single cell annotation JSON file.
 
-**aocseq** is a suite of statistical tools for the analysis of multimodal immunosequencing data. 
-
-The purpose of this statistical tool is to quantify single cell data and provide **1)** A sample list of mixed cell types with accompanying data sheets to measure the number of different cell types that are present in the blood or tissue and **2)** To detect, score and rank cells with optimal or desirable characteristics. Characteristics are defined by the gene expression of cells that are considered of interest because of their response to perturbation. 
-
-# Research applications
-
-The software combines probability and control theory with existing single cell analysis software for the classification of cells. Ultimately the aim is to provide a flexible framework that can be used to analyze a broad range of functional experiments that produce multi-modal data consisting of multiple different cell types. For a list of applications, see the section **Getting started** for the vignettes or the [slide deck](https://github.com/MaeWoods/aocseq/raw/main/SlideDeck.pdf) listing the functions. 
+The purpose of this micro tool is to compartmentalize single cell RNA sequencing steps used to manufacture transgenoc receptors.
 
 # Rationale for initial package development
 
