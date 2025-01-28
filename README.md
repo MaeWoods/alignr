@@ -1,4 +1,4 @@
-# alignr 0.1.0: An R package that produces a full length human T cell receptor by calling fragments and genes from a 10X genomics single cell annotation JSON file.
+# alignr 0.1.0: An R package that produces a full length receptor by calling fragments and genes from a 10X genomics single cell annotation JSON file.
 
 The purpose of this micro tool is to compartmentalize single cell RNA sequencing steps used to manufacture transgenic receptors.
 
