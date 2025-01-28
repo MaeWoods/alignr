@@ -1,0 +1,12 @@
+Package: alignr
+Type: Package
+Title: alignr 0.1.0: An R package to call a single full length TCR from a 10X genomics single cell RNA sequencing contain annotations JSON file.
+Version: 0.1.0
+Author: Mae Woods
+Maintainer: <mae.woods.uk@gmail.com>
+Description: alignr is a package that can be used to make full length TCR transgenes fro single cell RNA sequencing experiments.
+License: BSD2
+Encoding: UTF-8
+LazyData: true
+Imports: curl, readr, Rcpp, rjson
+RoxygenNote: 7.3.2
