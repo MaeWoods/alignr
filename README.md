@@ -15,11 +15,11 @@ Specifically, this is a software package of statistical tools that can be used t
 
 # Installation and running the software: 
 
-install_github("MaeWoods/aocseq");
+install_github("MaeWoods/alignr");
 
 library("alignr")
 
-See the **vignettes** for further help loading and running the software.
+See the **vignette** for further help loading and running the software.
 
 **Vignettes**
 
