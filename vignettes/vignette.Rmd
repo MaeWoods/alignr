@@ -1,0 +1,60 @@
+---
+title: "Creating a single cell JSON file containing VDJ contig annotations and extracting the receptor sequence"
+output: rmarkdown::html_vignette
+bibliography: references.bib  
+author: Mae Woods
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=6,fig.height=3
+)
+```
+
+## Example data set
+Start by downloading the all_contig_annotations csv and json files. For this example, download the data from the 10X genomics website (see 1[@10X] ) 
+
+## Install Required Packages
+alignr depends on curl, readr, and rjson. 
+
+To begin, load the required packages and choose the barcodes of the cells from which you would like to select to isolate the TCR sequence from.
+
+```{r, warning=FALSE}
+library(curl)
+library(readr)
+library(rjson)
+library(alignr)
+```
+
+## Running the selector
+The TCR alpha and beta chains corresponding to the cells that have been selected will be deposited in JSON format to the working directory. First set your current working directory to the directory above the Example folder and call the function GetTCRs.
+
+```{r}
+mybarcode="AAACCTGCACTCTGTC-1"
+my.contig.annotations=read.csv("../Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.csv")
+my.json.path="../Example/vdj_v1_hs_pbmc2_t_all_contig_annotations.json"
+my.save.dir="../Example/"
+GetTCRs(barcodes = mybarcode,
+        contig.annotations=my.contig.annotations,
+        json.path=my.json.path,
+        save.dir = my.save.dir)
+```
+
+## Making the receptor sequence
+The function GetTCRs in this case will have output three chains associated with the selected cell. Prior to the next step, which will output the receptor alpha and beta chains, check the txt files and use command search to see how many conditions must be satisfied to be true. Enter this into the function MakeReceptor, along with the number of cells being selected for receptor cloning and the input and output directories.  
+
+```{r}
+MakeReceptor(1,4,path="../Example/",
+             save.dir="../Example/")
+```
+
+## References
+
+<div id="refs"></div>
+
