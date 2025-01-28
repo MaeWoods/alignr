@@ -24,4 +24,4 @@ See the **vignette** for further help loading and running the software.
 **Vignettes**
 
 * To read in gene expression data and analyze clonotypes:
-[Getting started with alignr](./html/vignette.svg)
+[Getting started with alignr](./html/vignette.html)
