@@ -11,8 +11,8 @@
 #' @param json.path Directory where JSON file is saved.
 #' @param save.dir Directory where full length TCR transcripts will be saved.
 #' @param score Orders the cells be classification score. 
+#' @param ranked.sheet False. If true implements and saves the cells by their characteristic rank.
 #' @param verbose Print progress bars and output
-#' @return Void
 #' @concept Genomics
 #'
 #' @export
@@ -23,12 +23,8 @@ GetTCRs <- function(
     save.dir=".",
     score="",
     ranked.sheet=FALSE,
-    TCRs=c(1),
     verbose = TRUE
 ){
-  
-  dir.create(file.path(mainDir, "Cloning"), showWarnings = FALSE)
-  setwd(file.path(mainDir, subDir))
   
   result <- fromJSON(file = json.path)
   for(s in 1:length(barcodes)){
@@ -63,13 +59,11 @@ GetTCRs <- function(
 #' This function will import a set of single cell barcodes, extract the full length TCR transcript details
 #' and output the details ranked by the cell with the greatest functional score.
 #'
-#' @param barcodes Barcodes used to identify cells in full contig annotations JSON file.
-#' @param contig.annotations contig_annotations.csv file.
-#' @param json.path Directory where JSON file is saved.
-#' @param save.dir Directory where full length TCR transcripts will be saved.
-#' @param score Orders the cells be classification score. 
-#' @param verbose Print progress bars and output
-#' @return Void
+#' @param cell.data single cell RNA sequencing data processed by aocseq.
+#' @param gene gene list for UMI ranked cell types.
+#' @param meta.data select a metadata column to rank cell types.
+#' @param data.name name of metadata used for ranking.
+#' @param verbose Print progress bars and output.
 #' @concept Genomics
 #'
 #' @export
@@ -163,23 +157,19 @@ RankTCRs <- function(
 #' This function will import a set of single cell barcodes, extract the full length TCR transcript details
 #' and output the details ranked by the cell with the greatest functional score.
 #'
-#' @param barcodes Barcodes used to identify cells in full contig annotations JSON file.
-#' @param contig.annotations contig_annotations.csv file.
-#' @param json.path Directory where JSON file is saved.
-#' @param save.dir Directory where full length TCR transcripts will be saved.
-#' @param score Orders the cells be classification score. 
+#' @param n.cells Number of cells processed.
+#' @param path Path to output files from alignr::GetTCRs
+#' @param save.dir Directory where full length receptor sequences will be saved.
 #' @param verbose Print progress bars and output
-#' @return Void
 #' @concept Genomics
 #'
 #' @export
-GetFASTQ <- function(
-    gene.name,
+MakeReceptor <- function(
     n.cells,
-    path
+    check_count,
+    path=".",
+    save.dir="."
 ){
-  
-  for(){
   
   TRAC="XIQNPDPAVYQLRDSKSSDKSVCLFTDFDSQTNVSQSKDSDVYITDKTVLDMRSMDFKSN 
 SAVAWSNKSDFACANAFNNSIIPEDTFFPSPESSCDVKLVEKSFETDTNLNFQNLSVIGF 
@@ -193,38 +183,109 @@ VSAEAWGRADCGFTSESYQQGVLSATILYEILLGKATLYAVLVSALVLMAMVKRKDSRG"
 QPLKEQPALNDSRYCLSSRLRVSATFWQNPRNHFRCQVQFYGLSENDEWTQDRAKPVTQI 
 VSAEAWGRADCGFTSVSYQQGVLSATILYEILLGKATLYAVLVSALVLMAMVKRKDF"
   
-  if((JSON_output$X.barcode[141]=="[1] TRUE")&
-     (JSON_output$X.barcode[143]=="[1] TRUE")&
-     (JSON_output$X.barcode[145]=="[1] TRUE")&
-     (JSON_output$X.barcode[147]=="[1] TRUE")&
-     (JSON_output$X.barcode[149]=="[1] TRUE")&
-     (JSON_output$X.barcode[151]=="[1] TRUE")&
-     (JSON_output$X.barcode[153]=="[1] TRUE")){
-    print("yes")
-  }
+  curl_download("https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz",
+                paste(path,"HUMAN_9606_idmapping.dat.gz",sep=""),mode="w",quiet=FALSE)
   
-  if((JSON_output_TRB$X.barcode[141]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[143]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[145]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[147]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[149]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[151]=="[1] TRUE")&
-     (JSON_output_TRB$X.barcode[153]=="[1] TRUE")){
-    print("yes")
-  }
+  for(j in 1:n.cells){
+
+    flankTRAC=substring(TRAC,2,12)
+    flankTRBC1=substring(TRBC1,2,12)
+    flankTRBC2=substring(TRBC2,2,12)
+    FlankName="TBC"
+    n.chains=list.files(path, pattern=paste(paste("Cell",j,sep=""),"_",sep=""))
+    
+    for(k in n.chains){
+      JSON_output=read.csv(paste(path,k,sep=""),header=FALSE)
+      names(JSON_output) <- "X"
+      if(length(grep("TRA",t(JSON_output$X)))>0){
+        ###This means the chain is an alpha chain
+        Flank=flankTRAC
+        FlankName="TCRAlpha"
+      }else{
+        if(length(grep("TRBC1",t(JSON_output$X)))>0){
+          Flank=flankTRBC1
+          FlankName="TCRBetaC1"
+        }
+        else if(length(grep("TRBC2",t(JSON_output$X)))>0){
+          Flank=flankTRBC2
+          FlankName="TCRBetaC2"
+        }
+      }
+        ###This means the chain is an alpha chain
+        scheck=length(grep("TRUE",t(JSON_output$X)[grep("high_confidence",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("is_cell",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("productive",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("filtered",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("is_gex_cell",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("is_asm_cell",t(JSON_output$X))+1]))+
+          length(grep("TRUE",t(JSON_output$X)[grep("full_length",t(JSON_output$X))+1]))
+        
+        if(scheck==check_count){
+          ##Only proceed if a high confidence cell and productive receptor
+          gene.name=strsplit(t(JSON_output$X)[grep("gene_name",t(JSON_output$X))+1][1],split = " ")[[1]][2]
+          if(grepl("/",gene.name)){
+            gene.name=paste(strsplit(gene.name,split="/")[[1]][1],strsplit(gene.name,split="/")[[1]][2],sep="")
+          }
+          locusID = match(gene.name,read.table(gzfile("HUMAN_9606_idmapping.dat.gz"), fill = TRUE)$V3)
+          PiD = read.table(gzfile("HUMAN_9606_idmapping.dat.gz"), fill = TRUE)$V1[locusID]
+          curl_download(paste(paste("https://rest.uniprot.org/uniprotkb/",PiD,sep=""),
+                              ".fasta",sep=""),paste(gene.name,".txt",sep=""),mode="w",quiet=FALSE)
+          genefasta=read.csv(paste(gene.name,".txt",sep=""))
+          names(genefasta) <- "X"
+          genesubstring=substring(genefasta$X[1],1,40)
+          aasequence=strsplit(t(JSON_output$X)[grep("aa_sequence",t(JSON_output$X))+1],split = " ")[[1]][2]
+          
+          ###If no match, select fewer amino acids
+          s=1
+          while(!grepl(genesubstring,aasequence)){
+            genesubstring=substr(genesubstring,1,nchar(genesubstring)-s)
+          }
+          
+          if(grepl(genesubstring,aasequence)){
+            
+            aasequencestep=substr(aasequence,2,nchar(aasequence))
+            s=1
+            while(grepl(genesubstring,substr(aasequencestep,s,nchar(aasequencestep)))){
+              s=s+1
+              aasequencestep=substr(aasequencestep,s,nchar(aasequencestep))
+            }
+            ###Remove excess from receptor head
+            if(s>1){
+              aasequence=substr(aasequence,s+1,nchar(aasequence))
+            }
+            
+            #####Now focus on the r.h.s of the sequence
+            s=0
+            while(!grepl(substr(Flank,1,nchar(Flank)-s),aasequence)){
+              s=s+1
+            }
+            if(s>0){
+              Flank=substr(Flank,1,nchar(Flank)-s)
+            }
+            
+            aasequencestep=aasequence
+            s=1
+            while(grepl(Flank,substr(aasequencestep,1,nchar(aasequencestep)-s))){
+              s=s+1
+              aasequencestep=substr(aasequencestep,1,nchar(aasequencestep)-s)
+            }
+            ###Remove excess from receptor tail
+            if(s>1){
+              aasequence=substr(aasequencestep,1,nchar(aasequencestep)-(s+nchar(Flank)))
+            }
+              
+            
+          }
+          
+          ###Save chain to same folder
+          write.csv(aasequence,paste(save.dir,paste(FlankName,k),sep=""))
+        }
+      }
   
-  if(JSON_output$X.barcode[98]=="TRA"){
-  gene.name="TRAC"
-  path="/Users/maewoodsphd/mVSTManuscript/TCRCloning/Cloning/EBVFullLengthTCRs/TruePositive/Cell1Cloning/"
-  curl_download("https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping.dat.gz","/Users/maewoodsphd/mVSTManuscript/TCRCloning/Cloning/EBVFullLengthTCRs/TruePositive/Cell1Cloning/HUMAN_9606_idmapping.dat.gz",mode="w",quiet=FALSE)
-  locusID = match("TRAC",read.table(gzfile("/Users/maewoodsphd/mVSTManuscript/TCRCloning/Cloning/EBVFullLengthTCRs/TruePositive/Cell1Cloning/HUMAN_9606_idmapping.dat.gz"), fill = TRUE)$V3)
-  PiD = read.table(gzfile("/Users/maewoodsphd/mVSTManuscript/TCRCloning/Cloning/EBVFullLengthTCRs/TruePositive/Cell1Cloning/HUMAN_9606_idmapping.dat.gz"), fill = TRUE)$V1[locusID]
-  curl_download(paste(paste("https://rest.uniprot.org/uniprotkb/",PiD,sep=""),
-                      ".fasta",sep=""),"bb.txt",mode="w",quiet=FALSE)
-  }
-  
-  }
+    }
+
 }
+
   
   
 
