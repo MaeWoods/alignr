@@ -1,4 +1,4 @@
-# alignr 0.1.0: An R package that aligns human T cell receptors by calling TCR fragments and genes from a 10X genomics single cell RNA sequencing contain annotations JSON file.
+# alignr 0.1.0: An R package that produces a full length human T cell receptor by calling fragments and genes from a 10X genomics single cell annotation JSON file.
 
 **aocseq** is a suite of statistical tools for the analysis of multimodal immunosequencing data. 
 
